@@ -1,6 +1,6 @@
-﻿using System;
+﻿using EzCache.Error;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace EzCache.Cache
@@ -41,7 +41,7 @@ namespace EzCache.Cache
             if (_fastAccess.ContainsKey(key))
             {
                 _mt.ReleaseMutex();
-                throw new InvalidOperationException("");
+                throw new KeyAlreadyExistException(key);
             }
 
             LinkedListNode<ObjectValue> node = _cache.AddFirst(new ObjectValue(key, value));
@@ -49,6 +49,7 @@ namespace EzCache.Cache
             _lenght++;
             _mt.ReleaseMutex();
         }
+
 
         public void Remove(string key)
         {
@@ -65,25 +66,27 @@ namespace EzCache.Cache
             _mt.ReleaseMutex();
         }
 
-        public object GetElement(string key)
+        public bool TryGetElement(string key, out object valeur)
         {
+            valeur = default;
             _mt.WaitOne();
             if (_fastAccess.ContainsKey(key))
             {
                 LinkedListNode<ObjectValue> node =_fastAccess[key];
                 _cache.Remove(node);
                 _fastAccess[key] = _cache.AddFirst(node.Value);
+                valeur = node.Value.Value;
                 _mt.ReleaseMutex();
-                return node.Value.Value;
+                return true;
             }
             _mt.ReleaseMutex();
-            return null;
+            return false;
         }
 
         private void RemoveLeastUsed()
         {
             LinkedListNode<ObjectValue> lastNode = _cache.Last;
-            --_lenght;
+            _lenght--;
             _cache.Remove(lastNode);
             _fastAccess.Remove(lastNode.Value.Key);
         }

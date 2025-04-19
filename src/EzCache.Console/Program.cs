@@ -2,7 +2,7 @@
 
 public class Program
 {
-    private static readonly LruCache cache = new LruCache(10);
+    private static readonly LruCache cache = new LruCache(3);
     public static void Main()
     {
 
@@ -44,9 +44,16 @@ public class Program
         Console.Write("Key : ");
         string? key = Console.ReadLine();
 
-        string? val = cache.GetElement(key) as string;
+        bool resultCache = cache.TryGetElement(key, out object result);
+        if (!resultCache)
+        {
+            Console.WriteLine("Noting in cache");
+            goto end;
+        }
 
-        Console.WriteLine(val);
+        string? stringValue = result as string;
+        Console.WriteLine(stringValue);
+end:
         _ = Console.ReadKey();
     }
 
