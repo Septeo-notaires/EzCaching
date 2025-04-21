@@ -1,0 +1,43 @@
+name: .NET Core Desktop
+on:
+  push:
+    branches:
+      - "main"
+      - "dev"
+
+jobs:
+  build:
+    runs-on: debian-latest 
+    env:
+      Solution_Name: EzCache
+      Test_Project_Path: EzCache.Tests
+      Source_Directory: ./src
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # Install the .NET Core workload
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.0
+
+    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
+
+    # Build Solution
+    - name: Build solution
+      
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      run: dotnet test
+
+    # Restore the application to populate the obj folder with RuntimeIdentifiers
+    - name: Restore the application
+      run: dotnet build -c Release
+    
