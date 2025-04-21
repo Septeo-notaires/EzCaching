@@ -31,6 +31,10 @@ namespace EzCache.Cache
             }
         }
 
+        public LruCache(int capacity, bool cap) : this(capacity)
+        {
+        }
+
         public LruCache(int capacity) => 
             _capacity = capacity;
 
