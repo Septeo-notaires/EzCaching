@@ -1,6 +1,11 @@
-﻿namespace EzCache.Tests.Helpers.Exts;
+﻿using System.Runtime.CompilerServices;
+using EzCache.Cache;
 
-public class LruCacheExt
+namespace EzCache.Tests.Helpers.Exts;
+
+public static class LruCacheExt
 {
-    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void RemoveLeastUsed(this LruCache instance) =>
+        instance.ExecutePrivateMethod("RemoveLeastUsed");
 }
