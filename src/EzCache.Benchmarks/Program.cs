@@ -2,4 +2,5 @@
 using EzCache.Benchmarks.Benchmark;
 using EzCache.Cache;
 
-BenchmarkRunner.Run<LruCacheAddOperationWithFullCacheBench>();
+BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
+    .Run();

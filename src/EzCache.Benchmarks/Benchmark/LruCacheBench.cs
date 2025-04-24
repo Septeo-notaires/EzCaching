@@ -6,9 +6,9 @@ using EzCache.Cache;
 
 namespace EzCache.Benchmarks.Benchmark;
 
-[SimpleJob(RunStrategy.Monitoring, iterationCount: 100)]
+[SimpleJob(RunStrategy.Monitoring, iterationCount: 50)]
 [MinColumn, MaxColumn, MeanColumn, MedianColumn]
-public class LruCacheEmptyCacheBench
+public class LruCacheEmptyCache
 {
     private const string referenceKey = "referenceKey";
     private const string referenceValue = "referenceValue";
@@ -30,9 +30,9 @@ public class LruCacheEmptyCacheBench
     }
 }
 
-[SimpleJob(RunStrategy.Monitoring, iterationCount: 100)]
+[SimpleJob(RunStrategy.Monitoring, iterationCount: 50)]
 [MinColumn, MaxColumn, MeanColumn, MedianColumn]
-public class LruCacheFullCacheBench
+public class LruCacheFullCache
 {
     private LruCache _cache;
     
@@ -55,15 +55,42 @@ public class LruCacheFullCacheBench
     }
 }
 
-[SimpleJob(RunStrategy.Monitoring, iterationCount: 100, launchCount:10, warmupCount:1)]
+[SimpleJob(RunStrategy.Monitoring, iterationCount: 50)]
 [MinColumn, MaxColumn, MeanColumn, MedianColumn]
-public class LruCacheAddOperationWithFullCacheBench
+public class LruCacheAddOperationCache
 {
     private LruCache _cache;
-    [GlobalSetup]
+    
+    [Params(true, false)] public bool Empty { get; set; }
+    
+    [IterationSetup()]
     public void Setup()
     {
-        _cache = new LruCache(100_000_000);
+        const int capacity = 100_000;
+        _cache = new LruCache(capacity);
+        if (!Empty)
+        {
+            for (int i = 0; i < capacity; i++)
+                _cache.Add($"ref_{i}", "value");
+        }
+    }
+    
+    [Benchmark(OperationsPerInvoke = 10)]
+    public void AddOperation_10()
+    {
+        ExecuteOperation(10);
+    }
+    
+    [Benchmark(OperationsPerInvoke = 100)]
+    public void AddOperation_100()
+    {
+        ExecuteOperation(100);
+    }
+    
+    [Benchmark(OperationsPerInvoke = 1000)]
+    public void AddOperation_1000()
+    {
+        ExecuteOperation(1000);
     }
 
     [Benchmark(OperationsPerInvoke = 10_000)]
@@ -78,18 +105,6 @@ public class LruCacheAddOperationWithFullCacheBench
         ExecuteOperation(100_000);
     }
     
-    [Benchmark(OperationsPerInvoke = 1_000_000)]
-    public void AddOperation_1_000_000()
-    {
-        ExecuteOperation(1_000_000);
-    }
-    
-    [Benchmark(OperationsPerInvoke = 100_000_000)]
-    public void AddOperation_100_000_000()
-    {
-        ExecuteOperation(10_000);
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ExecuteOperation(int nbElement)
     {
