@@ -20,5 +20,10 @@
         {
             throw new System.NotImplementedException();
         }
+
+        internal HitPolicyStrategy(ICachePolicy policy)
+        {
+            HitPolicy pol = (HitPolicy)policy;
+        }
     }
 }

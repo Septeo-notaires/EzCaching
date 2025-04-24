@@ -1,6 +1,8 @@
-﻿using EzCache.Error;
+﻿using System;
+using EzCache.Error;
 using System.Collections.Generic;
 using System.Threading;
+using EzCache.Policy;
 
 namespace EzCache.Cache
 {
@@ -20,13 +22,15 @@ namespace EzCache.Cache
 
         struct ObjectValue
         {
+            public ICachePolicyStrategy CacheStrategy { get; private set; }
             public string Key { get; private set; }
             public object Value { get; private set; }
 
-            public ObjectValue(string key, object value)
+            public ObjectValue(string key, object value, ICachePolicyStrategy cacheStrategy = null)
             {
                 Key = key;
                 Value = value;
+                CacheStrategy = cacheStrategy;
             }
         }
 
@@ -38,7 +42,7 @@ namespace EzCache.Cache
         public LruCache(int capacity) => 
             _capacity = capacity;
 
-        public void Add(string key, object value)
+        public void Add(string key, object value, ICachePolicy policy = null)
         {
             _mt.WaitOne();
             if (_length >= _capacity) RemoveLeastUsed();
@@ -48,7 +52,16 @@ namespace EzCache.Cache
                 throw new KeyAlreadyExistException(key);
             }
 
-            LinkedListNode<ObjectValue> node = _cache.AddFirst(new ObjectValue(key, value));
+            ObjectValue objValue = policy switch
+            {
+                null => new ObjectValue(key, value),
+                HitPolicy => new ObjectValue(key, value, new HitPolicyStrategy(policy)),
+                TtlPolicy => new ObjectValue(key, value, new TtlPolicyStrategy(policy)),
+                GroupingPolicy => new ObjectValue(key, value, new GroupingPolicyStrategy(policy)),
+                _ => throw new NotImplementedException()
+            };
+
+            LinkedListNode<ObjectValue> node = _cache.AddFirst(objValue);
             _fastAccess.Add(key, node);
             _length++;
             _mt.ReleaseMutex();

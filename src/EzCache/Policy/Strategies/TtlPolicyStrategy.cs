@@ -16,5 +16,10 @@
         {
             throw new System.NotImplementedException();
         }
+
+        internal TtlPolicyStrategy(ICachePolicy policy)
+        {
+            TtlPolicy pol = (TtlPolicy)policy;
+        }
     }
 }

@@ -16,5 +16,10 @@
         {
             throw new System.NotImplementedException();
         }
+
+        public GroupingPolicyStrategy(ICachePolicy policy)
+        {
+            GroupingPolicy pol = (GroupingPolicy)policy;
+        }
     }
 }
