@@ -20,13 +20,13 @@ public class LruCacheEmptyCache
     public void Setup()
     {
         _cache = new LruCache(Capacity);
-        _cache.Add(referenceKey, referenceValue);
+        _cache.Add(referenceKey, new ObjectValueCache(referenceKey, referenceValue));
     }
 
     [Benchmark]
     public bool GetElementOperation()
     {
-        return _cache.TryGetElement(referenceKey, out object _);
+        return _cache.TryGetElement(referenceKey, out var _);
     }
 }
 
@@ -45,13 +45,13 @@ public class LruCacheFullCache
         _cache = new LruCache(Capacity);
         Enumerable.Range(0, Capacity)
             .ToList()
-            .ForEach(i => _cache.Add($"ref_{i}", "value"));
+            .ForEach(i => _cache.Add($"ref_{i}", new ObjectValueCache($"ref_{i}", "value")));
     }
 
     [Benchmark]
     public bool GetElementOperation()
     {
-        return _cache.TryGetElement(ReferenceKey, out object _);
+        return _cache.TryGetElement(ReferenceKey, out var _);
     }
 }
 
@@ -71,7 +71,7 @@ public class LruCacheAddOperationCache
         if (!Empty)
         {
             for (int i = 0; i < capacity; i++)
-                _cache.Add($"ref_{i}", "value");
+                _cache.Add($"ref_{i}", new ObjectValueCache($"ref_{i}", "value"));
         }
     }
     
@@ -109,6 +109,6 @@ public class LruCacheAddOperationCache
     private void ExecuteOperation(int nbElement)
     {
         for (int i = 0; i < nbElement; i++)
-            _cache.Add($"key_{i}", "value");
+            _cache.Add($"key_{i}", new ObjectValueCache($"key_{i}", "value"));
     }
 }

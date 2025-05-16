@@ -19,17 +19,17 @@ public class LruCacheTestsAsync : BaseLruCacheTests
         await Parallel.ForEachAsync(keyValue, async (i, _) =>
         {
             await Task.Delay(delay);
-            cache.Add(i.Key, i.Value);
+            cache.Add(i.Key, new ObjectValueCache(i.Key, i.Value));
         });
         
         // Assert
         foreach (KeyValuePair<string, string> keyVal in keyValue)
         {
-            bool result = cache.TryGetElement(keyVal.Key, out object value);
+            bool result = cache.TryGetElement(keyVal.Key, out var value);
             result.ShouldBeTrue();
-            value.ShouldNotBeNull();
-            value.ShouldBeOfType<string>();
-            value.ShouldBe(keyVal.Value);
+            ((ObjectValueCache)value).Value.ShouldNotBeNull();
+            ((ObjectValueCache)value).Value.ShouldBeOfType<string>();
+            ((ObjectValueCache)value).Value.ShouldBe(keyVal.Value);
         }
     }
     
@@ -51,7 +51,7 @@ public class LruCacheTestsAsync : BaseLruCacheTests
                         async () =>
                         {
                             await Task.Delay(delay);
-                            cache.Add(p.Key, p.Value);
+                            cache.Add(p.Key, new ObjectValueCache(p.Key, p.Value));
                         })
                     )
             );
@@ -59,11 +59,11 @@ public class LruCacheTestsAsync : BaseLruCacheTests
         // Assert
         foreach (KeyValuePair<string, string> keyVal in keyValue)
         {
-            bool result = cache.TryGetElement(keyVal.Key, out object value);
+            bool result = cache.TryGetElement(keyVal.Key, out var value);
             result.ShouldBeTrue();
-            value.ShouldNotBeNull();
-            value.ShouldBeOfType<string>();
-            value.ShouldBe(keyVal.Value);
+            ((ObjectValueCache)value).Value.ShouldNotBeNull();
+            ((ObjectValueCache)value).Value.ShouldBeOfType<string>();
+            ((ObjectValueCache)value).Value.ShouldBe(keyVal.Value);
         }
     }
 }

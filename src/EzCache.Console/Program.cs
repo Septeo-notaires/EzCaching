@@ -35,7 +35,7 @@ public class Program
         Console.Write("Value : ");
         string? value = Console.ReadLine();
 
-        cache.Add(key, value);
+        cache.Add(key, new ObjectValueCache(key, value));
     }
 
     private static void GetInCache()
@@ -44,14 +44,14 @@ public class Program
         Console.Write("Key : ");
         string? key = Console.ReadLine();
 
-        bool resultCache = cache.TryGetElement(key, out object result);
+        bool resultCache = cache.TryGetElement(key, out var result);
         if (!resultCache)
         {
             Console.WriteLine("Noting in cache");
             goto end;
         }
 
-        string? stringValue = result as string;
+        string? stringValue = ((ObjectValueCache)result).Value as string;
         Console.WriteLine(stringValue);
 end:
         _ = Console.ReadKey();

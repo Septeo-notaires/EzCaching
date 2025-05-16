@@ -1,9 +1,9 @@
-﻿namespace EzCache.Policy
+﻿using System;
+
+namespace EzCache.Policy;
+
+public interface ICachePolicyStrategy
 {
-    internal interface ICachePolicyStrategy
-    {
-        void AddPolicy();
-        void GetPolicy();
-        void RemovePolicy();
-    }
+    void GetPolicy();
+    void RemovePolicy();
 }

@@ -1,25 +1,20 @@
-﻿namespace EzCache.Policy
+﻿using System;
+
+namespace EzCache.Policy;
+
+internal class GroupingPolicyStrategy : ICachePolicyStrategy    
 {
-    internal class GroupingPolicyStrategy : ICachePolicyStrategy    
+    public GroupingPolicyStrategy(ICachePolicy policy)
     {
-        void ICachePolicyStrategy.AddPolicy()
-        {
-            throw new System.NotImplementedException();
-        }
+        GroupingPolicy pol = (GroupingPolicy)policy;
+    }
+    public void GetPolicy()
+    {
+        throw new System.NotImplementedException();
+    }
 
-       void ICachePolicyStrategy.GetPolicy()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        void ICachePolicyStrategy.RemovePolicy()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public GroupingPolicyStrategy(ICachePolicy policy)
-        {
-            GroupingPolicy pol = (GroupingPolicy)policy;
-        }
+    public void RemovePolicy()
+    {
+        throw new System.NotImplementedException();
     }
 }

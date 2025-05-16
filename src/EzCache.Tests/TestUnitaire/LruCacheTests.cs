@@ -31,13 +31,13 @@ public partial class LruCacheTests : BaseLruCacheTests
 
         //Act
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         //Assert
         foreach (KeyValuePair<string, string> keyValue in keyValues)
         {
             bool result = cache.TryGetElement(keyValue.Key, out var value);
-            string? val = value as string;
+            string? val = ((ObjectValueCache)value).Value as string;
 
             result.ShouldBeTrue();
             val.ShouldBe(keyValue.Value);
@@ -56,10 +56,10 @@ public partial class LruCacheTests : BaseLruCacheTests
 
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         //Act
-        cache.Add(addedNewKey, addedNewValue);
+        cache.Add(addedNewKey, new ObjectValueCache(addedNewKey, addedNewValue));
 
         //Assert
         bool result = cache.TryGetElement("test_1", out var value);
@@ -78,14 +78,14 @@ public partial class LruCacheTests : BaseLruCacheTests
 
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
-        cache.Add(addedNewKey, addedNewValue);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
+        cache.Add(addedNewKey, new ObjectValueCache(addedNewKey, addedNewValue));
 
         //Act
-        bool result = cache.TryGetElement(addedNewKey, out object value);
+        bool result = cache.TryGetElement(addedNewKey, out var value);
         //Assert
         result.ShouldBeTrue();
-        value.ShouldBe(addedNewValue);
+        ((ObjectValueCache)value).Value.ShouldBe(addedNewValue);
         return Task.CompletedTask;
     }
 
@@ -99,10 +99,9 @@ public partial class LruCacheTests : BaseLruCacheTests
 
 
         //Act
-        cache.Add(key1, value1);
+        cache.Add(key1, new ObjectValueCache(key1,value1));
 
-        //Assert
-        _ = Assert.Throws<KeyAlreadyExistException>(() => cache.Add(key1, value1));
+        _ = Assert.Throws<KeyAlreadyExistException>(() => cache.Add(key1, new ObjectValueCache(key1, value1)));
         return Task.CompletedTask;
     }
 
@@ -113,7 +112,7 @@ public partial class LruCacheTests : BaseLruCacheTests
         //Arrange
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         string removeKey = keyValues.Select(p => p.Key).First();
         cache.Remove(removeKey);
@@ -133,7 +132,7 @@ public partial class LruCacheTests : BaseLruCacheTests
         //Arrange
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         int initLength = cache.GetFieldValue<LruCache, int>("_length");
         string removeKey = keyValues.Select(p => p.Key).First();
@@ -158,7 +157,7 @@ public partial class LruCacheTests : BaseLruCacheTests
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
 
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         int initialLength = cache.GetFieldValue<LruCache, int>("_length");
         // Act
@@ -183,14 +182,14 @@ public partial class LruCacheTests : BaseLruCacheTests
         (LruCache cache, IEnumerable<KeyValuePair<string, string>> keyValues) = InitTest(capacity);
 
         foreach (KeyValuePair<string, string> keyValue in keyValues)
-            cache.Add(keyValue.Key, keyValue.Value);
+            cache.Add(keyValue.Key, new ObjectValueCache(keyValue.Key, keyValue.Value));
 
         // Act
         cache.RemoveLeastUsed();
 
         // Assert
         string lastKey = keyValues.Select(p => p.Key).First();
-        bool result = cache.TryGetElement(lastKey, out object value);
+        bool result = cache.TryGetElement(lastKey, out var value);
 
         result.ShouldBeFalse();
         value.ShouldBeNull();
