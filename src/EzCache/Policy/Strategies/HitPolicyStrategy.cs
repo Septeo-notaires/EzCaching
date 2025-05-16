@@ -8,6 +8,7 @@ internal class HitPolicyStrategy : ICachePolicyStrategy
     #region Private Variables
     private int _nbHits = 0;
     private readonly int _maxHit;
+    private readonly HitPolicy _policy;
     #endregion Private Variables
 
     internal HitPolicyStrategy(ICachePolicy policy)
@@ -15,13 +16,8 @@ internal class HitPolicyStrategy : ICachePolicyStrategy
         HitPolicy pol = (HitPolicy)policy;
     }
     
-    internal HitPolicyStrategy(int maxHit) =>
-        _maxHit = maxHit;
-    
-    public void GetPolicy()
-    {
-        throw new NotImplementedException();
-    }
+    public bool GetPolicy()
+        => _nbHits++ < _maxHit;
 
     public void RemovePolicy()
     {

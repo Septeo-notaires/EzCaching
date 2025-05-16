@@ -23,43 +23,63 @@ public class Cache
     public Cache(int capacity) =>
         _lruCache = new LruCache(capacity);
 
-    public void Add(string key, object value, ICachePolicy? policy = null)
-    {
-        if (policy == null)
-        {
-            // Default implementation of add operation
-        }
-    }
-
     public object? TryGetElement(string key, Func<object> func, ICachePolicy? policy = null)
     {
-        if (policy == null)
+        bool result = _lruCache.TryGetElement(key, out ObjectValueCache? cachedObject);
+        if (!result || cachedObject == null)
+            return ExecuteFuncAndAdd(key, func, policy);
+
+        if (cachedObject is { CacheStrategy: not null } cache)
         {
-            // Default retrieve implementation of get operation
+            bool resultPolicy = cache.CacheStrategy.GetPolicy();
+            if (resultPolicy) return cachedObject.Value;
         }
-        return new();
+
+        return ExecuteFuncAndAdd(key, func, policy);
     }
 
     /*Add cache stampede*/
     public async Task<object?> TryGetElementAsync(string key, Func<Task<object>> funcAsync, ICachePolicy? policy = null)
     {
-        var result = await funcAsync();
-        if (policy == null)
+        bool result = _lruCache.TryGetElement(key, out ObjectValueCache? cachedObject);
+        if (!result || cachedObject == null)
+            return await ExecuteFuncAndAddAsync(key, funcAsync, policy);
+
+        if (cachedObject is { CacheStrategy: not null } cache)
         {
-            // Default retrieve implementation of get operation
+            bool resultPolicy = cache.CacheStrategy.GetPolicy();
+            if (resultPolicy) return cachedObject.Value;
         }
-        return result;
+
+        return await ExecuteFuncAndAddAsync(key, funcAsync, policy);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Remove(string key) =>
         _lruCache.Remove(key);
 
-    private ICachePolicyStrategy ReturnCachePolicyStrategy(ICachePolicy policy) => policy switch
+    private ICachePolicyStrategy? ReturnCachePolicyStrategy(ICachePolicy? policy) => policy switch
     {
         TtlPolicy => new TtlPolicyStrategy(policy),
         HitPolicy => new HitPolicyStrategy(policy),
         GroupingPolicy => new GroupingPolicyStrategy(policy),
-        _ => throw new NotImplementedException()
+        null => null,
+        _ => throw new System.NotImplementedException()
     };
+
+    private object ExecuteFuncAndAdd(string key, Func<object> func, ICachePolicy? policy = null)
+    {
+        object resultFunc = func();
+        _lruCache.Add(key, new ObjectValueCache(key, resultFunc, ReturnCachePolicyStrategy(policy)));
+        return resultFunc;
+    }
+    
+    private async Task<object> ExecuteFuncAndAddAsync(string key, Func<Task<object>> func, ICachePolicy? policy = null)
+    {
+        object resultFunc = await func()
+            .ConfigureAwait(false);
+        
+        _lruCache.Add(key, new ObjectValueCache(key, resultFunc, ReturnCachePolicyStrategy(policy)));
+        return resultFunc;
+    }
 }

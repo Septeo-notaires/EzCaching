@@ -4,6 +4,6 @@ namespace EzCache.Policy;
 
 public interface ICachePolicyStrategy
 {
-    void GetPolicy();
+    bool GetPolicy();
     void RemovePolicy();
 }

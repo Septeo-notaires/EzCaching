@@ -11,14 +11,12 @@ internal class TtlPolicyStrategy : ICachePolicyStrategy
     {
         _policy = (TtlPolicy)policy;
     }
-    
-    public void GetPolicy()
-    {
-        throw new System.NotImplementedException();
-    }
+
+    public bool GetPolicy()
+        => !_policy.Expires;
 
     public void RemovePolicy()
     {
-        throw new System.NotImplementedException();
+        
     }
 }

@@ -4,15 +4,17 @@ namespace EzCache.Policy;
 
 internal class GroupingPolicyStrategy : ICachePolicyStrategy    
 {
+    #region Private Fields
+    private readonly GroupingPolicy _policy;
+    #endregion Private Fields
     public GroupingPolicyStrategy(ICachePolicy policy)
     {
-        GroupingPolicy pol = (GroupingPolicy)policy;
-    }
-    public void GetPolicy()
-    {
-        throw new System.NotImplementedException();
+        _policy = (GroupingPolicy)policy;
     }
 
+    public bool GetPolicy() 
+        => true;
+    
     public void RemovePolicy()
     {
         throw new System.NotImplementedException();
