@@ -4,18 +4,21 @@ namespace EzCache.Policy;
 
 internal class TtlPolicyStrategy : ICachePolicyStrategy
 {
-    void ICachePolicyStrategy.GetPolicy()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    void ICachePolicyStrategy.RemovePolicy()
-    {
-        throw new System.NotImplementedException();
-    }
-
+    #region Private Fields
+    private readonly TtlPolicy _policy;
+    #endregion
     internal TtlPolicyStrategy(ICachePolicy policy)
     {
-        TtlPolicy pol = (TtlPolicy)policy;
+        _policy = (TtlPolicy)policy;
+    }
+    
+    public void GetPolicy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RemovePolicy()
+    {
+        throw new System.NotImplementedException();
     }
 }

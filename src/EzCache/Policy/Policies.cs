@@ -9,11 +9,9 @@ public interface ICachePolicy { }
 
 public class HitPolicy : ICachePolicy
 {
-    #region Private Variables
-    
+    #region Private Fields
     private readonly int _maxHit;
-    
-    #endregion Private Variables
+    #endregion Private Fields
 
     internal int MaxHit => _maxHit;
 
@@ -23,23 +21,26 @@ public class HitPolicy : ICachePolicy
 
 public class TtlPolicy : ICachePolicy
 {
-    #region Private Variables
+    #region Private Fields
     private readonly TimeSpan _ttl;
-    #endregion Private Variables
+    private readonly DateTime _endTime;
+    #endregion Private Fields
+
+    #region Properties
+    public bool Expires => DateTime.Now > _endTime;
+    #endregion Properties
     
-    internal TimeSpan Ttl => _ttl;
-    
-    public TtlPolicy(TimeSpan ttl) 
-        => _ttl = ttl;
+    public TtlPolicy(TimeSpan ttl)
+    {
+        _endTime = DateTime.Now + _ttl;
+    }
 }
 
 public class GroupingPolicy : ICachePolicy
 {
-    #region Private Variables
-    
+    #region Private Fields
     private readonly string _groupName;
-    
-    #endregion Private Variables
+    #endregion Private Fields
     
     internal string GroupName => _groupName;
     

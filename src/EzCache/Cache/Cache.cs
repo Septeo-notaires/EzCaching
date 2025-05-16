@@ -54,4 +54,12 @@ public class Cache
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Remove(string key) =>
         _lruCache.Remove(key);
+
+    private ICachePolicyStrategy ReturnCachePolicyStrategy(ICachePolicy policy) => policy switch
+    {
+        TtlPolicy => new TtlPolicyStrategy(policy),
+        HitPolicy => new HitPolicyStrategy(policy),
+        GroupingPolicy => new GroupingPolicyStrategy(policy),
+        _ => throw new NotImplementedException()
+    };
 }
