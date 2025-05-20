@@ -35,15 +35,3 @@ public class TtlPolicy : ICachePolicy
         _endTime = DateTime.Now + _ttl;
     }
 }
-
-public class GroupingPolicy : ICachePolicy
-{
-    #region Private Fields
-    private readonly string _groupName;
-    #endregion Private Fields
-    
-    internal string GroupName => _groupName;
-    
-    public GroupingPolicy(string groupName)
-        => _groupName = groupName;
-}
